@@ -1,0 +1,24 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "npm run vercel-build",
+  "outputDirectory": "dist",
+  "installCommand": "npm install",
+  "framework": null,
+  "functions": {
+    "dist/vercel.js": {
+      "includeFiles": "../prisma/schema.prisma",
+      "maxDuration": 10
+    }
+  },
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/dist/vercel.js" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Credentials", "value": "true" }
+      ]
+    }
+  ]
+}

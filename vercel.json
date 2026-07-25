@@ -1,0 +1,6 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "echo 'Deploy client and server as separate Vercel projects — see README.md'",
+  "buildCommand": "echo 'Deploy client and server as separate Vercel projects — see README.md'",
+  "devCommand": "echo 'Use local dev commands as documented in README.md'"
+}

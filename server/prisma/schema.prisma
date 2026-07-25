@@ -1,0 +1,70 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String     @id @default(auto()) @map("_id") @db.ObjectId
+  email      String     @unique
+  password   String
+  fullName   String
+  role       String     @default("MEMBER") // "ADMIN" or "MEMBER"
+  leads      Lead[]     @relation("AssignedLeads")
+  notes      Note[]
+  activities Activity[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+model Lead {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  fullName     String
+  email        String
+  phone        String?
+  company      String?
+  source       String     @default("WEBSITE")
+  message      String?
+  status       String     @default("NEW")
+  assignedTo   User?      @relation("AssignedLeads", fields: [assignedToId], references: [id])
+  assignedToId String?    @db.ObjectId
+  notes        Note[]
+  activities   Activity[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([email])
+  @@index([status])
+  @@index([assignedToId])
+  @@index([source])
+  @@index([createdAt])
+}
+
+model Note {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  content   String
+  lead      Lead     @relation(fields: [leadId], references: [id])
+  leadId    String   @db.ObjectId
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String   @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Activity {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  type        String
+  description String
+  lead        Lead     @relation(fields: [leadId], references: [id])
+  leadId      String   @db.ObjectId
+  actor       User?    @relation(fields: [actorId], references: [id])
+  actorId     String?  @db.ObjectId
+  createdAt   DateTime @default(now())
+
+  @@index([leadId])
+  @@index([createdAt])
+}

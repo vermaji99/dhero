@@ -1,0 +1,25 @@
+
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+
+# Testing
+coverage/
+
+# Prisma
+*.db
+*.db-journal
+
+# Logs
+npm-debug.log*
