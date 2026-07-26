@@ -4,15 +4,6 @@
   "outputDirectory": "dist",
   "installCommand": "npm install",
   "framework": null,
-  "functions": {
-    "dist/vercel.js": {
-      "includeFiles": "../prisma/schema.prisma",
-      "maxDuration": 10
-    }
-  },
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/dist/vercel.js" }
-  ],
   "headers": [
     {
       "source": "/(.*)",
