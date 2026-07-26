@@ -1,15 +1,23 @@
-// Vercel Serverless Function — catch-all route under /api/* (forwarded to compiled NestJS handler)
-// This file exists in the source tree so Vercel sees it at clone time and skips pre-build
-// "functions" pattern validation that broke the old dist/vercel.js setup.
-const path = require('path');
+// Vercel serverless catch-all — the actual Vercel Function that gets discovered at clone time.
+// - Lives in server/api/[...all].js (source-controlled, no CLI-56 pre-build validation failure).
+// - At runtime, lazy-loads the compiled Nest+@vendia/serverless-express entry from
+//   process.cwd() + /dist/vercel.js, which npm run vercel-build generates.
+// - Uses the rewrites rule in vercel.json to forward EVERY route (/*) to /api/[...all],
+//   so Nest's globalPrefix 'api' still works for URLs like /api/auth/login, /api/leads, etc.
+
 let cachedHandler;
+
+function loadCompiledHandler() {
+  // Vercel runs this function with the project Root Directory as cwd.
+  // Root Directory = 'server' ⇒ cwd = .../dhero/server  ⇒ dist/vercel.js exists here.
+  const path = require('path');
+  const entry = require(path.join(process.cwd(), 'dist', 'vercel.js'));
+  return entry.handler;
+}
 
 module.exports = async (event, context) => {
   if (!cachedHandler) {
-    // Nest build emits the compiled @vendia/serverless-express entry to dist/vercel.js
-    // Root Directory is `server`, so ../dist/vercel.js resolves to server/dist/vercel.js.
-    const entry = require(path.join(process.cwd(), 'dist', 'vercel.js'));
-    cachedHandler = entry.handler;
+    cachedHandler = loadCompiledHandler();
   }
   return cachedHandler(event, context);
 };
