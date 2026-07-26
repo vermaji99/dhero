@@ -11,6 +11,29 @@ import { TransformInterceptor } from './common/interceptors/transform.intercepto
 
 let cachedServer: ReturnType<typeof serverlessExpress>;
 
+function parseCorsOrigins(envValue: string | undefined): (string | RegExp)[] | true {
+  if (!envValue) {
+    return [
+      /^https:\/\/.*\.vercel\.app$/,
+      /^http:\/\/localhost:\d+$/,
+    ];
+  }
+  if (envValue === '*') return true;
+  const parsed = envValue
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .map((pattern) => {
+      if (pattern.includes('*')) {
+        const escaped = pattern.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*');
+        return new RegExp(`^${escaped}$`);
+      }
+      return pattern.replace(/\/$/, '');
+    });
+  parsed.push(/^https:\/\/.*\.vercel\.app$/, /^http:\/\/localhost:\d+$/);
+  return parsed;
+}
+
 async function bootstrap() {
   if (cachedServer) return cachedServer;
 
@@ -18,9 +41,31 @@ async function bootstrap() {
   const adapter = new ExpressAdapter(expressApp);
   const app = await NestFactory.create(AppModule, adapter);
 
+  const allowedOrigins = parseCorsOrigins(process.env.CORS_ORIGIN);
+
   app.enableCors({
-    origin: process.env.CORS_ORIGIN ?? true,
+    origin: (requestOrigin, callback) => {
+      if (!requestOrigin) return callback(null, true);
+      if (allowedOrigins === true) return callback(null, true);
+      const match = allowedOrigins.some((o) =>
+        typeof o === 'string'
+          ? requestOrigin.replace(/\/$/, '') === o
+          : o.test(requestOrigin),
+      );
+      callback(null, match ? requestOrigin : false);
+    },
     credentials: true,
+    allowedHeaders: [
+      'Origin',
+      'X-Requested-With',
+      'Content-Type',
+      'Accept',
+      'Authorization',
+      'Accept-Encoding',
+    ],
+    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
   });
 
   app.useGlobalPipes(
@@ -50,6 +95,7 @@ async function bootstrap() {
 }
 
 export const handler = async (event: any, context: any, callback: any) => {
+  context.callbackWaitsForEmptyEventLoop = false;
   const server = await bootstrap();
   return server(event, context, callback);
 };

@@ -6,12 +6,39 @@ import { ValidationPipe } from '@nestjs/common';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 
+function parseCorsOrigins(envValue: string | undefined): (string | RegExp)[] | true | undefined {
+  if (!envValue) return undefined;
+  if (envValue === '*') return true;
+  return envValue
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .map((pattern) => {
+      if (pattern.includes('*')) {
+        const escaped = pattern.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*');
+        return new RegExp(`^${escaped}$`);
+      }
+      return pattern.replace(/\/$/, '');
+    });
+}
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  
-  // Enable CORS
+
+  const allowedOrigins = parseCorsOrigins(process.env.CORS_ORIGIN);
+
   app.enableCors({
-    origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+    origin: (requestOrigin, callback) => {
+      if (!requestOrigin) return callback(null, true);
+      if (allowedOrigins === true) return callback(null, true);
+      if (!allowedOrigins) return callback(null, true);
+      const match = allowedOrigins.some((o) =>
+        typeof o === 'string'
+          ? requestOrigin.replace(/\/$/, '') === o
+          : o.test(requestOrigin),
+      );
+      callback(null, match ? requestOrigin : false);
+    },
     credentials: true,
   });
 

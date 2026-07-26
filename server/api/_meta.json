@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "runtime": "@vercel/node@4",
+  "endpoints": [
+    { "path": "api/health.js", "route": "/api/health", "methods": ["GET", "OPTIONS"] },
+    { "path": "api/auth/login.js", "route": "/api/auth/login", "methods": ["POST", "OPTIONS"] },
+    { "path": "api/[...all].js", "route": "/api/(.*)", "methods": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"] }
+  ]
+}

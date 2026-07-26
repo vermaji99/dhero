@@ -1,13 +1,40 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "$schema-comment": "DO NOT override framework or outputDirectory from the Vercel UI. Settings here are authoritative.",
   "buildCommand": "npm run vercel-build",
   "installCommand": "npm install",
   "framework": null,
+  "outputDirectory": "public",
+  "cleanUrls": false,
+  "trailingSlash": false,
+  "functions": {
+    "api/health.js": {
+      "runtime": "@vercel/node@4",
+      "memory": 1024,
+      "maxDuration": 10
+    },
+    "api/auth/login.js": {
+      "runtime": "@vercel/node@4",
+      "memory": 1024,
+      "maxDuration": 10
+    },
+    "api/[...all].js": {
+      "runtime": "@vercel/node@4",
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  },
+  "rewrites": [
+    { "source": "/", "destination": "/api/health" },
+    { "source": "/api/:path*", "destination": "/api/:path*" }
+  ],
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "Access-Control-Allow-Credentials", "value": "true" }
+        { "key": "Access-Control-Allow-Credentials", "value": "true" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
       ]
     }
   ]
