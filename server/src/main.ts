@@ -7,9 +7,15 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 
 function parseCorsOrigins(envValue: string | undefined): (string | RegExp)[] | true | undefined {
-  if (!envValue) return undefined;
+  const base: (string | RegExp)[] = [
+    'https://dhero-client.vercel.app',
+    /^https:\/\/.*--dhero-client\.vercel\.app$/,
+    /^https:\/\/.*\.vercel\.app$/,
+    /^http:\/\/localhost:\d+$/,
+  ];
+  if (!envValue) return base;
   if (envValue === '*') return true;
-  return envValue
+  const parsed = envValue
     .split(',')
     .map((s) => s.trim())
     .filter(Boolean)
@@ -20,6 +26,7 @@ function parseCorsOrigins(envValue: string | undefined): (string | RegExp)[] | t
       }
       return pattern.replace(/\/$/, '');
     });
+  return [...parsed, ...base];
 }
 
 async function bootstrap() {

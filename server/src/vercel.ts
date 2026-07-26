@@ -12,12 +12,15 @@ import { TransformInterceptor } from './common/interceptors/transform.intercepto
 let cachedServer: ReturnType<typeof serverlessExpress>;
 
 function parseCorsOrigins(envValue: string | undefined): (string | RegExp)[] | true {
-  if (!envValue) {
-    return [
-      /^https:\/\/.*\.vercel\.app$/,
-      /^http:\/\/localhost:\d+$/,
-    ];
-  }
+  // Always-allowed hosts regardless of env: the deployed client domain,
+  // preview deployments on Vercel, and local dev.
+  const base: (string | RegExp)[] = [
+    'https://dhero-client.vercel.app',
+    /^https:\/\/.*--dhero-client\.vercel\.app$/,
+    /^https:\/\/.*\.vercel\.app$/,
+    /^http:\/\/localhost:\d+$/,
+  ];
+  if (!envValue) return base;
   if (envValue === '*') return true;
   const parsed = envValue
     .split(',')
@@ -30,8 +33,7 @@ function parseCorsOrigins(envValue: string | undefined): (string | RegExp)[] | t
       }
       return pattern.replace(/\/$/, '');
     });
-  parsed.push(/^https:\/\/.*\.vercel\.app$/, /^http:\/\/localhost:\d+$/);
-  return parsed;
+  return [...parsed, ...base];
 }
 
 async function bootstrap() {
