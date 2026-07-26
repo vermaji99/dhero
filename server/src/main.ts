@@ -1,5 +1,5 @@
 
-import 'dotenv/config';
+try { require('dotenv').config(); } catch { /* local .env only */ }
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';

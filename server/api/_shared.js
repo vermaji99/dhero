@@ -9,29 +9,27 @@ let cachedHandlerPromise;
 
 function writeToLog(line) {
   const ts = new Date().toISOString();
-  // Vercel Function Logs show everything written to stdout / stderr in the
-  // project -> Logs tab. Using stderr ensures startup failures aren't missed.
   process.stderr.write(`[leadflow-vercel ${ts}] ${line}\n`);
 }
+
+const HANDLER_RELATIVE_PATH = path.join(__dirname, '..', 'dist', 'vercel.js');
 
 function loadCompiledHandlerOnce() {
   if (cachedHandlerPromise) return cachedHandlerPromise;
 
   cachedHandlerPromise = (async () => {
-    const entryPath = path.join(process.cwd(), 'dist', 'vercel.js');
-    writeToLog(`loading compiled handler from cwd=${process.cwd()} path=${entryPath}`);
+    writeToLog(`loading compiled handler from __dirname=${__dirname} path=${HANDLER_RELATIVE_PATH} cwd=${process.cwd()}`);
     try {
-      // Clear Node's require cache for safety during redeploys (defensive).
-      delete require.cache[require.resolve(entryPath)];
+      delete require.cache[require.resolve(HANDLER_RELATIVE_PATH)];
     } catch {
       // ignore if not in cache yet
     }
 
     let entry;
     try {
-      entry = require(entryPath);
+      entry = require(HANDLER_RELATIVE_PATH);
     } catch (err) {
-      writeToLog(`FATAL require('dist/vercel.js') failed: ${err && err.stack ? err.stack : err}`);
+      writeToLog(`FATAL require('dist/vercel.js') via ${HANDLER_RELATIVE_PATH} failed: ${err && err.stack ? err.stack : err}`);
       throw err;
     }
 

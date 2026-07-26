@@ -11,17 +11,20 @@
     "api/health.js": {
       "runtime": "@vercel/node@4",
       "memory": 1024,
-      "maxDuration": 10
+      "maxDuration": 10,
+      "includeFiles": "dist/**"
     },
     "api/auth/login.js": {
       "runtime": "@vercel/node@4",
       "memory": 1024,
-      "maxDuration": 10
+      "maxDuration": 10,
+      "includeFiles": "dist/**"
     },
     "api/[...all].js": {
       "runtime": "@vercel/node@4",
       "memory": 1024,
-      "maxDuration": 10
+      "maxDuration": 10,
+      "includeFiles": "dist/**"
     }
   },
   "rewrites": [

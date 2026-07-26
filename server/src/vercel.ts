@@ -1,5 +1,5 @@
 
-import 'dotenv/config';
+try { require('dotenv').config(); } catch { /* Vercel injects env vars at runtime */ }
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { ValidationPipe } from '@nestjs/common';
