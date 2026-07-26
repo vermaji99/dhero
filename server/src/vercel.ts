@@ -34,7 +34,14 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalInterceptors(new TransformInterceptor());
 
-  app.setGlobalPrefix('api');
+  // NOTE: On Vercel we serve everything from under /api via the catch-all at
+  //       api/[...all].js. The incoming path is already prefixed with /api
+  //       (e.g. /api/auth/login). If we also called setGlobalPrefix('api'),
+  //       Nest would prepend its own /api again -> lookups would hit
+  //       /api/api/auth/login and 404. So the Vercel handler intentionally
+  //       skips the global prefix. Local dev (main.ts) still uses
+  //       setGlobalPrefix('api') for the http://localhost:3000/api/... URL
+  //       shape expected in docs / earlier configurations.
 
   await app.init();
 
