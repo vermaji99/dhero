@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LeadFlow — deploy client &amp; server separately</title>
+  </head>
+  <body style="font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; padding: 48px 24px; background: #0b1020; color: #e6ebf5;">
+    <div style="max-width: 640px; margin: 0 auto;">
+      <h1 style="font-size: 28px;">LeadFlow</h1>
+      <p style="color: #a5b4cf;">This repo is a monorepo. Deploy the <code>client</code> and <code>server</code> folders as <strong>two separate Vercel projects</strong>, each with <strong>Root Directory</strong> set to <code>client</code> and <code>server</code> respectively.</p>
+      <ul style="color: #a5b4cf; line-height: 1.75;">
+        <li>Client (React + Vite SPA): Root Directory = <code>client</code>, env <code>VITE_API_URL=&lt;server-domain&gt;/api</code></li>
+        <li>Server (NestJS + Prisma / MongoDB): Root Directory = <code>server</code>, envs <code>DATABASE_URL</code>, <code>JWT_SECRET</code>, <code>CORS_ORIGIN=&lt;client-domain&gt;</code></li>
+      </ul>
+      <p style="color: #7f8cac;">You accidentally deployed the repo root. Delete this Vercel project and create two new ones using the Root Directory setting, or run <code>vercel</code> from inside the <code>client/</code> and <code>server/</code> folders on your machine.</p>
+    </div>
+  </body>
+</html>
