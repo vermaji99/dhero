@@ -19,7 +19,7 @@ import {
 } from '../types'
 import { useAuthStore } from '../store/authStore'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://dhero-server-gamma.vercel.app/api'
 
 async function fetchApi<T>(
   endpoint: string,

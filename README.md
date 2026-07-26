@@ -1,7 +1,7 @@
 
 # LeadFlow - Lead Management System
 
-A modern, full-stack lead management application built with NestJS, React, and PostgreSQL. Features role-based access control, lead lifecycle tracking, notes, activity history, and a public contact form.
+A modern, full-stack lead management application built with NestJS, React, and MongoDB. Features role-based access control, lead lifecycle tracking, notes, activity history, and a public contact form.
 
 ## Features
 
@@ -18,7 +18,7 @@ A modern, full-stack lead management application built with NestJS, React, and P
 
 ### Backend
 - **Framework**: NestJS
-- **Database**: PostgreSQL with Prisma ORM
+- **Database**: MongoDB with Prisma ORM
 - **Authentication**: JWT tokens
 - **Validation**: Zod/class-validator
 - **Testing**: Jest + Supertest
@@ -35,7 +35,7 @@ A modern, full-stack lead management application built with NestJS, React, and P
 
 ### Prerequisites
 - Node.js 18+
-- PostgreSQL 14+
+- MongoDB (MongoDB Atlas, self-hosted, or local)
 
 ### 1. Clone the repository
 ```bash
@@ -52,7 +52,7 @@ cp .env.example .env
 
 Edit `.env` with your database credentials and JWT secret:
 ```env
-DATABASE_URL="postgresql://postgres:password@localhost:5432/leadflow?schema=public"
+DATABASE_URL="mongodb+srv://USER:PASSWORD@cluster0.mongodb.net/dhero?retryWrites=true&w=majority&appName=Cluster0"
 JWT_SECRET="your-super-secret-jwt-key-here"
 JWT_EXPIRES_IN="7d"
 CORS_ORIGIN="http://localhost:5173"
@@ -72,7 +72,7 @@ cp .env.example .env
 cd server
 npm install
 npx prisma generate
-npx prisma migrate dev --name init
+npx prisma db push
 npx prisma db seed
 ```
 
@@ -94,6 +94,7 @@ npm run dev
 The application will be available at:
 - Frontend: http://localhost:5173
 - Backend API: http://localhost:3000
+- Deployed backend (Vercel): https://dhero-server-gamma.vercel.app/api
 
 ## Demo Credentials
 
@@ -208,14 +209,16 @@ npm run test
 ## Deployment
 
 ### Backend
-1. Set up a PostgreSQL database (e.g., Supabase, Neon, Railway)
-2. Set environment variables
-3. Run Prisma migrations: `npx prisma migrate deploy`
-4. Deploy to a platform like Render, Railway, or Vercel
+1. Set up a MongoDB database (e.g., MongoDB Atlas)
+2. Set environment variables (`DATABASE_URL`, `JWT_SECRET`, `CORS_ORIGIN`, etc.)
+3. Run Prisma schema sync: `npx prisma db push`
+4. Seed demo data: `npx prisma db seed`
+5. Deploy to Vercel as a separate project (Root Directory = `server`)
 
 ### Frontend
-1. Build: `npm run build`
-2. Deploy to Vercel, Netlify, or similar
+1. Set `VITE_API_URL=https://dhero-server-gamma.vercel.app/api`
+2. Build: `npm run build`
+3. Deploy to Vercel as a separate project (Root Directory = `client`)
 
 ## Project Structure
 
